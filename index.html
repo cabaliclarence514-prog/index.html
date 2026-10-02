@@ -125,7 +125,7 @@ body.friends .aurora,body.friends .stars{opacity:0}
       <input type="text" id="newCat" placeholder="New category name" maxlength="30" aria-label="New category name">
       <button type="button" class="ghost" id="addCat">Add category</button>
     </div>
-    <label>Photos or videos<input type="file" id="file" accept="image/*,video/*" multiple required></label>
+    <label>Photos<input type="file" id="file" accept="image/*" multiple required></label>
     <label>Caption<input type="text" id="caption" placeholder="Write a caption" maxlength="160"></label>
     <p class="note" id="msg"></p>
     <div class="row"><button type="button" class="ghost" data-close>Close</button><button class="btn" id="add">Upload</button></div>
@@ -135,21 +135,18 @@ body.friends .aurora,body.friends .stars{opacity:0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script>
 /* SETUP
-   1. Firebase console: turn on Authentication > Email/Password, Firestore and Storage.
+   1. Firebase console: turn on Authentication > Email/Password and Firestore. Storage is not needed: photos are saved inside Firestore.
    2. Paste your web config below.
    3. Create YOUR account first, using the username in OWNER_HANDLE. Your album is the page everyone sees by default.
    4. Firestore rules:
       rules_version='2'; service cloud.firestore { match /databases/{d}/documents {
         match /users/{uid} { allow read: if true; allow write: if request.auth.uid==uid; }
         match /handles/{h} { allow read: if true; allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid; }
-        match /album/{id} { allow read: if true; allow create: if request.auth.uid==request.resource.data.uid;
+        match /album/{id} { allow read: if true; allow create: if request.auth.uid==request.resource.data.uid && request.resource.data.url.size()<900000;
                             allow update, delete: if request.auth.uid==resource.data.uid; } } }
-   5. Storage rules:
-      rules_version='2'; service firebase.storage { match /b/{b}/o {
-        match /album/{uid}/{f} { allow read: if true; allow write: if request.auth.uid==uid && request.resource.size<100*1024*1024; } } }
+   5. Photos only (about 1000 px wide); videos are not supported without Firebase Storage.
    Links: yourpage.html opens the OWNER_HANDLE album; yourpage.html#name opens another account. */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA4b7S2ezd6wQ6Zur84_E8wzCh6oCmi_Po",
@@ -173,7 +170,7 @@ if (!FIREBASE_CONFIG) {
 
 function start(){
   firebase.initializeApp(FIREBASE_CONFIG);
-  const auth = firebase.auth(), db = firebase.firestore(), bucket = firebase.storage();
+  const auth = firebase.auth(), db = firebase.firestore();
   const friendly = e => ({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email already has an account.","auth/weak-password":"Use at least 6 characters.","auth/invalid-email":"Enter a valid email."}[e.code] || e.message);
 
   /* ---- viewing an album ---- */
@@ -188,14 +185,15 @@ function start(){
     const handle = decodeURIComponent(location.hash.slice(1)) || p.get("u") || OWNER_HANDLE;
     const u = await getUser(handle);
     if (!u){ view = null; TABS = []; drawTabs(); $("sub").textContent = ""; $("grid").innerHTML = `<div class="empty">No account named ${esc(handle)}.</div>`; return; }
-    view = u; TABS = u.cats && u.cats.length ? u.cats : DEFAULT_CATS.slice(); tab = TABS[0];
+    view = u; TABS = u.cats && u.cats.length ? u.cats : DEFAULT_CATS.slice(); tab = TABS[0]; await loadItems();
     $("sub").textContent = u.handle.toLowerCase() === OWNER_HANDLE.toLowerCase() ? "Every moment, kept in its own little universe." : `@${u.handle}'s album`;
     drawTabs(); render();
   }
-  async function list(t){
-    const s = await db.collection("album").where("uid","==",view.uid).where("tab","==",t).get();
-    return s.docs.map(d => d.data()).sort((a,b) => b.date - a.date);
+  async function loadItems(){
+    const s = await db.collection("album").where("uid","==",view.uid).get();
+    view.items = s.docs.map(d => d.data()).sort((a,b) => b.date - a.date);
   }
+  const list = t => view.items.filter(i => i.tab === t);
   function drawTabs(){
     document.body.classList.toggle("partner", tab === "Partner");
     document.body.classList.toggle("family", tab === "Family");
@@ -281,6 +279,27 @@ function start(){
     $("authGo").disabled = false;
   };
 
+  /* ---- shrink a photo so it fits inside a database document ---- */
+  function shrink(file){
+    return new Promise((res, rej) => {
+      const img = new Image(), u = URL.createObjectURL(file);
+      img.onerror = () => rej(new Error("Could not read that photo."));
+      img.onload = () => {
+        let sc = Math.min(1, 1000 / Math.max(img.width, img.height)), q = .8, out;
+        for (;;){
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          out = c.toDataURL("image/jpeg", q);
+          if (out.length < 400000 || sc < .2) break;
+          q = Math.max(.5, q - .1); sc *= .85;
+        }
+        URL.revokeObjectURL(u); res(out);
+      };
+      img.src = u;
+    });
+  }
+
   /* ---- upload (your own album only) ---- */
   const fillCats = sel => { $("cat").innerHTML = me.cats.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(""); $("cat").value = sel; };
   function openUpload(){ fillCats(view && view.uid === me.uid ? tab : me.cats[0]); $("msg").textContent = ""; $("up").showModal(); }
@@ -299,12 +318,11 @@ function start(){
     $("add").disabled = true; $("msg").textContent = "Uploading…";
     try {
       for (const f of files){
-        const ref = bucket.ref(`album/${me.uid}/${Date.now()}-${f.name}`);
-        await ref.put(f);
-        await db.collection("album").add({uid:me.uid, tab:cat, caption:$("caption").value.trim(), url:await ref.getDownloadURL(), path:ref.fullPath, type:f.type, date:Date.now()});
+        if (!f.type.startsWith("image/")) throw new Error("Only photos are supported.");
+        await db.collection("album").add({uid:me.uid, tab:cat, caption:$("caption").value.trim(), url:await shrink(f), type:"image/jpeg", date:Date.now()});
       }
       $("file").value = ""; $("caption").value = ""; $("up").close();
-      if (view && view.uid === me.uid){ tab = cat; drawTabs(); render(); } else location.hash = me.handle;
+      if (view && view.uid === me.uid){ tab = cat; await loadItems(); drawTabs(); render(); } else location.hash = me.handle;
     } catch(err){ $("msg").textContent = "Could not upload: " + err.message; }
     $("add").disabled = false;
   };
