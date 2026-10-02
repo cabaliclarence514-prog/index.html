@@ -118,6 +118,17 @@ footer.site .info{margin:8px auto 0;padding:0}
 .pw{position:relative;display:block}
 .pw input{padding-right:64px!important}
 .pw button{position:absolute;right:8px;top:calc(50% + 3px);transform:translateY(-50%);border:0;background:none;color:var(--acc2);font:inherit;font-size:.8rem;cursor:pointer;padding:4px 6px}
+
+nav .burger{display:none;padding:10px 16px;font-size:1.1rem;line-height:1}
+nav .menu{display:contents}
+@media (max-width:640px){
+  nav{position:relative;padding:18px 14px;gap:8px}
+  nav button{padding:9px 16px}
+  nav .burger{display:inline-block}
+  nav .menu{display:none;position:absolute;top:100%;right:14px;z-index:20;flex-direction:column;gap:6px;min-width:170px;padding:10px;margin-top:-6px;border:1px solid var(--line);border-radius:18px;background:rgba(24,16,60,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  nav.open .menu{display:flex}
+  nav .menu button{text-align:left;border-radius:12px}
+}
 </style>
 </head>
 <body>
@@ -265,9 +276,17 @@ function start(){
     document.body.classList.toggle("partner", tab === "Partner");
     document.body.classList.toggle("family", tab === "Family");
     document.body.classList.toggle("friends", tab === "Friends");
-    $("tabs").innerHTML = TABS.map(t => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t===tab}">${esc(t)}<span>0</span></button>`).join("");
+    const KEEP = 2, btn = t => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t===tab}">${esc(t)}<span>0</span></button>`;
+    const extra = TABS.slice(KEEP);
+    $("tabs").classList.remove("open");
+    $("tabs").innerHTML = TABS.slice(0, KEEP).map(btn).join("") +
+      (extra.length ? `<button class="burger" aria-label="More tabs" aria-haspopup="true" aria-expanded="false" aria-selected="${extra.includes(tab)}">&#9776;</button>` : "") +
+      `<div class="menu">${extra.map(btn).join("")}</div>`;
   }
-  $("tabs").onclick = e => { const b = e.target.closest("button"); if(b){ tab = b.dataset.tab; drawTabs(); render(); } };
+  $("tabs").onclick = e => { const b = e.target.closest("button"); if(!b) return;
+    if (b.classList.contains("burger")){ const o = $("tabs").classList.toggle("open"); b.setAttribute("aria-expanded", o); return; }
+    tab = b.dataset.tab; drawTabs(); render(); };
+  document.addEventListener("click", e => { if (!e.target.closest("#tabs")) { $("tabs").classList.remove("open"); const bg = $("tabs").querySelector(".burger"); if (bg) bg.setAttribute("aria-expanded","false"); } });
   /* ---- looping swipe carousel: one picture at a time ---- */
   function carousel(g, items){
     const n = items.length, half = Math.floor(n / 2);
@@ -317,7 +336,7 @@ function start(){
     g.innerHTML = "";
     if (!items.length) g.innerHTML = `<div class="empty">Nothing in ${esc(tab)} yet.</div>`;
     if (items.length) carousel(g, items);
-    for (const b of $("tabs").querySelectorAll("button")) b.querySelector("span").textContent = (await list(b.dataset.tab)).length;
+    for (const b of $("tabs").querySelectorAll("button[data-tab]")) b.querySelector("span").textContent = (await list(b.dataset.tab)).length;
   }
   window.onhashchange = route;
 
