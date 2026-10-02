@@ -114,6 +114,10 @@ footer.site summary{cursor:pointer;color:var(--mute);font-size:13px;list-style:n
 footer.site summary:hover{color:var(--acc2)}
 footer.site details[open]{display:block;margin:12px 0}
 footer.site .info{margin:8px auto 0;padding:0}
+
+.pw{position:relative;display:block}
+.pw input{padding-right:64px!important}
+.pw button{position:absolute;right:8px;top:calc(50% + 3px);transform:translateY(-50%);border:0;background:none;color:var(--acc2);font:inherit;font-size:.8rem;cursor:pointer;padding:4px 6px}
 </style>
 </head>
 <body>
@@ -200,7 +204,7 @@ footer.site .info{margin:8px auto 0;padding:0}
    4. Firestore rules (replace clarencecabali.socmed@gmail.com with your OWNER_EMAIL; keep OWNER_HANDLE as "owner" or change 'owner' here too):
       rules_version='2'; service cloud.firestore { match /databases/{d}/documents {
         match /users/{uid} { allow read: if true;
-          allow write: if request.auth.uid==uid && (request.resource.data.handleLower!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
+          allow write: if request.auth.uid==uid && getAfter(/databases/$(d)/documents/handles/$(request.resource.data.handleLower)).data.uid==request.auth.uid && (request.resource.data.handleLower!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
         match /handles/{h} { allow read: if true;
           allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid && (h!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
         match /album/{id} { allow read: if true;
@@ -343,7 +347,7 @@ function start(){
   auth.onAuthStateChanged(u => u ? loadMe(u.uid) : (me = null, paintAuth()));
   $("acts").onclick = e => { const a = e.target.closest("button")?.dataset.a;
     if (a === "in") openAuth(); else if (a === "add") openUpload();
-    else if (a === "mine") location.hash = me.handle; else if (a === "out") auth.signOut(); };
+    else if (a === "mine") location.hash = me.handle; else if (a === "out"){ auth.signOut().then(() => { me = null; paintAuth(); if (location.hash || location.search) { history.replaceState(null, "", location.pathname); } route(); }); } };
 
   let mode = "in";
   function setMode(m){
@@ -454,6 +458,32 @@ function start(){
     clearTimeout(timer); timer = setTimeout(() => clicks = 0, 2500);
     if (++clicks >= 5){ clicks = 0; if (me) openUpload(); else { $("ownPw").value = ""; $("ownErr").textContent = ""; $("own").showModal(); $("ownPw").focus(); } }
   };
+  /* show / hide password toggles */
+  ["apw","ownPw"].forEach(id => {
+    const i = $(id); if (!i) return;
+    const w = document.createElement("span"); w.className = "pw";
+    i.parentNode.insertBefore(w, i); w.appendChild(i);
+    const b = document.createElement("button"); b.type = "button"; b.textContent = "Show"; b.setAttribute("aria-label","Show password");
+    b.onclick = () => { const show = i.type === "password"; i.type = show ? "text" : "password"; b.textContent = show ? "Hide" : "Show"; b.setAttribute("aria-label", show ? "Hide password" : "Show password"); };
+    w.appendChild(b);
+  });
+  document.querySelectorAll("dialog").forEach(d => d.addEventListener("close", () => d.querySelectorAll(".pw").forEach(w => { const i = w.querySelector("input"), b = w.querySelector("button"); i.type = "password"; b.textContent = "Show"; })));
+
+  /* live username check while typing */
+  let hT;
+  $("handle").addEventListener("input", () => {
+    clearTimeout(hT);
+    const h = $("handle").value.trim(), err = $("authErr"); err.textContent = "";
+    if (mode !== "up" || h.length < 3) return;
+    hT = setTimeout(async () => {
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(h)) { err.textContent = "Username: 3-20 letters, numbers or _."; return; }
+      try {
+        const taken = h.toLowerCase() === OWNER_HANDLE.toLowerCase() || (await db.collection("handles").doc(h.toLowerCase()).get()).exists;
+        if ($("handle").value.trim() === h) err.textContent = taken ? "That username is taken." : "";
+      } catch(e){}
+    }, 400);
+  });
+
   route();
 }
 </script>
