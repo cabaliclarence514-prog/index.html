@@ -117,6 +117,15 @@ body.friends .aurora,body.friends .stars{opacity:0}
   </form>
 </dialog>
 
+<dialog id="own">
+  <form id="ownForm">
+    <h2>Enter password</h2>
+    <input type="password" id="ownPw" placeholder="Password" autocomplete="current-password" aria-label="Password" required>
+    <p class="err" id="ownErr"></p>
+    <div class="row"><button type="button" class="ghost" data-close>Cancel</button><button class="btn" id="ownGo">Unlock</button></div>
+  </form>
+</dialog>
+
 <dialog id="up">
   <form id="upForm">
     <h2>Add to the album</h2>
@@ -139,13 +148,18 @@ body.friends .aurora,body.friends .stars{opacity:0}
 /* SETUP
    1. Firebase console: turn on Authentication > Email/Password and Firestore. Storage is not needed: photos are saved inside Firestore.
    2. Paste your web config below.
-   3. Create YOUR account first, using the username in OWNER_HANDLE. Your album is the page everyone sees by default.
-   4. Firestore rules:
+   3. Firebase console > Authentication > Users > Add user: use the OWNER_EMAIL below and the password you want for uploads.
+      Then click the page title 5 times on the site, enter that password, and the upload window opens.
+      Your album is the default page for everyone, unless they search for or open another account.
+   4. Firestore rules (replace clarencecabali.socmed@gmail.com with your OWNER_EMAIL; keep OWNER_HANDLE as "owner" or change 'owner' here too):
       rules_version='2'; service cloud.firestore { match /databases/{d}/documents {
-        match /users/{uid} { allow read: if true; allow write: if request.auth.uid==uid; }
-        match /handles/{h} { allow read: if true; allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid; }
-        match /album/{id} { allow read: if true; allow create: if request.auth.uid==request.resource.data.uid && request.resource.data.url.size()<900000;
-                            allow update, delete: if request.auth.uid==resource.data.uid; } } }
+        match /users/{uid} { allow read: if true;
+          allow write: if request.auth.uid==uid && (request.resource.data.handleLower!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
+        match /handles/{h} { allow read: if true;
+          allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid && (h!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
+        match /album/{id} { allow read: if true;
+          allow create: if request.auth.uid==request.resource.data.uid && request.resource.data.url.size()<900000;
+          allow update, delete: if request.auth.uid==resource.data.uid; } } }
    5. Photos only (about 1000 px wide); videos are not supported without Firebase Storage.
    Links: yourpage.html opens the OWNER_HANDLE album; yourpage.html#name opens another account. */
 const FIREBASE_CONFIG = {
@@ -157,6 +171,7 @@ const FIREBASE_CONFIG = {
   appId: "1:603100127952:web:d90a9edab1ec50477534d5"
 };
 const OWNER_HANDLE = "owner";
+const OWNER_EMAIL = "clarencecabali.socmed@gmail.com"; // your owner login email (create it in Firebase Authentication > Users)
 
 const $ = id => document.getElementById(id);
 const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -171,7 +186,7 @@ if (!FIREBASE_CONFIG) {
 function start(){
   firebase.initializeApp(FIREBASE_CONFIG);
   const auth = firebase.auth(), db = firebase.firestore();
-  const friendly = e => ({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email already has an account.","auth/weak-password":"Use at least 6 characters.","auth/invalid-email":"Enter a valid email."}[e.code] || e.message);
+  const friendly = e => ({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email already has an account.","auth/weak-password":"Use at least 6 characters.","auth/invalid-email":"Enter a valid email.","auth/user-not-found":"The owner login has not been created in Firebase Authentication yet."}[e.code] || e.message);
 
   /* ---- viewing an album ---- */
   async function getUser(handle){
@@ -183,13 +198,15 @@ function start(){
   async function route(){
     const p = new URLSearchParams(location.search);
     const handle = decodeURIComponent(location.hash.slice(1)) || p.get("u") || OWNER_HANDLE;
-    const u = await getUser(handle);
+    let u = await getUser(handle);
+    if (!u && handle.toLowerCase() === OWNER_HANDLE.toLowerCase()) u = {uid:null, handle:OWNER_HANDLE, cats:DEFAULT_CATS.slice()};
     if (!u){ view = null; TABS = []; drawTabs(); $("sub").textContent = ""; $("grid").innerHTML = `<div class="empty">No account named ${esc(handle)}.</div>`; return; }
     view = u; TABS = u.cats && u.cats.length ? u.cats : DEFAULT_CATS.slice(); tab = TABS[0]; await loadItems();
     $("sub").textContent = u.handle.toLowerCase() === OWNER_HANDLE.toLowerCase() ? "Every moment, kept in its own little universe." : `@${u.handle}'s album`;
     drawTabs(); render();
   }
   async function loadItems(){
+    if (!view.uid){ view.items = []; return; }
     const s = await db.collection("album").where("uid","==",view.uid).get();
     view.items = s.docs.map(d => d.data()).sort((a,b) => b.date - a.date);
   }
@@ -262,6 +279,7 @@ function start(){
       else {
         const handle = $("handle").value.trim();
         if (!/^[A-Za-z0-9_]{3,20}$/.test(handle)) throw new Error("Username: 3-20 letters, numbers or _.");
+        if (handle.toLowerCase() === OWNER_HANDLE.toLowerCase()) throw new Error("That username is reserved.");
         const hr = db.collection("handles").doc(handle.toLowerCase());
         if ((await hr.get()).exists) throw new Error("That username is taken.");
         const c = await auth.createUserWithEmailAndPassword(email, pw), uid = c.user.uid;
@@ -327,11 +345,30 @@ function start(){
     $("add").disabled = false;
   };
 
-  /* clicking the title 5 times opens sign in, or your upload window when signed in */
+  $("ownForm").onsubmit = async e => {
+    e.preventDefault(); $("ownGo").disabled = true; $("ownErr").textContent = "";
+    try {
+      const c = await auth.signInWithEmailAndPassword(OWNER_EMAIL, $("ownPw").value), uid = c.user.uid;
+      const ref = db.collection("users").doc(uid);
+      if (!(await ref.get()).exists){
+        const hr = db.collection("handles").doc(OWNER_HANDLE.toLowerCase());
+        await db.runTransaction(async t => {
+          t.set(hr, {uid});
+          t.set(ref, {handle:OWNER_HANDLE, handleLower:OWNER_HANDLE.toLowerCase(), cats:DEFAULT_CATS, date:Date.now()});
+        });
+      }
+      await loadMe(uid); $("own").close();
+      if (location.hash) location.hash = ""; else await route();
+      openUpload();
+    } catch(err){ $("ownErr").textContent = err.code === "auth/invalid-credential" ? "Wrong password. Try again." : friendly(err); }
+    $("ownGo").disabled = false;
+  };
+
+  /* clicking the title 5 times asks for the owner password (or opens the upload window when already signed in) */
   let clicks = 0, timer;
   $("title").onclick = () => {
     clearTimeout(timer); timer = setTimeout(() => clicks = 0, 2500);
-    if (++clicks >= 5){ clicks = 0; me ? openUpload() : openAuth(); }
+    if (++clicks >= 5){ clicks = 0; if (me) openUpload(); else { $("ownPw").value = ""; $("ownErr").textContent = ""; $("own").showModal(); $("ownPw").focus(); } }
   };
   route();
 }
