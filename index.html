@@ -40,7 +40,7 @@ main{max-width:1100px;margin:0 auto;padding:0 20px 70px}
 .btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(155,123,255,.7)}
 .btn:disabled{opacity:.5;cursor:wait}
 #msg{width:100%;margin:0;font-size:.9rem;color:var(--mute)}
-#grid{columns:3 260px;column-gap:20px}
+#grid{max-width:760px;margin:0 auto}
 figure{margin:0 0 20px;break-inside:avoid;background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4);transition:transform .3s,box-shadow .3s,border-color .3s}
 figure:hover{transform:translateY(-5px);border-color:rgba(155,123,255,.7);box-shadow:0 18px 50px rgba(120,90,255,.35)}
 figure img,figure video{display:block;width:100%;background:#000}
@@ -87,6 +87,16 @@ body.friends .aurora,body.friends .stars{opacity:0}
 .res button:hover,.res button:focus-visible{background:rgba(155,123,255,.25)}
 .res p{margin:0;padding:9px 12px;color:var(--mute)}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
+.car{position:relative;outline:none}
+.stage{position:relative;height:min(72vh,620px);overflow:hidden;border-radius:24px;border:1px solid var(--line);background:rgba(8,5,30,.55);box-shadow:0 18px 50px rgba(0,0,0,.45);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.stage.drag{cursor:grabbing}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .35s ease,opacity .35s ease}
+.slide img,.slide video{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.slide p{position:absolute;left:0;right:0;bottom:0;margin:0;padding:36px 18px 16px;text-align:center;background:linear-gradient(transparent,rgba(5,3,20,.85))}
+.nav{position:absolute;top:calc(50% - 22px);width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(20,12,55,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--ink);font-size:1.6rem;line-height:1;cursor:pointer;z-index:2}
+.nav:hover{background:rgba(155,123,255,.5)}
+.prev{left:10px}.next{right:10px}
+.count{text-align:center;margin-top:14px;color:var(--mute);font-size:.9rem}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -218,17 +228,55 @@ function start(){
     $("tabs").innerHTML = TABS.map(t => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t===tab}">${esc(t)}<span>0</span></button>`).join("");
   }
   $("tabs").onclick = e => { const b = e.target.closest("button"); if(b){ tab = b.dataset.tab; drawTabs(); render(); } };
+  /* ---- looping swipe carousel: one picture at a time ---- */
+  function carousel(g, items){
+    const n = items.length, half = Math.floor(n / 2);
+    let cur = 0, dx = 0, x0 = 0, drag = false;
+    g.innerHTML = `<div class="car" tabindex="0" aria-roledescription="carousel"><div class="stage"></div>${n > 1 ? '<button class="nav prev" aria-label="Previous picture">&#8249;</button><button class="nav next" aria-label="Next picture">&#8250;</button>' : ""}<div class="count"></div></div>`;
+    const car = g.firstChild, stage = car.querySelector(".stage"), count = car.querySelector(".count");
+    const slides = items.map(i => {
+      const d = document.createElement("div"); d.className = "slide";
+      d.innerHTML = i.type.startsWith("video") ? `<video src="${esc(i.url)}" controls playsinline></video>` : `<img src="${esc(i.url)}" alt="" draggable="false">`;
+      if (i.caption){ const c = document.createElement("p"); c.textContent = i.caption; d.appendChild(c); }
+      stage.appendChild(d); return d;
+    });
+    function paint(){
+      slides.forEach((d, k) => {
+        let off = ((k - cur + n + half) % n) - half;
+        if (n === 2 && off !== 0) off = dx > 0 ? -1 : 1;
+        const jump = d._off !== undefined && Math.abs(off - d._off) > 1;
+        d.style.transition = jump || drag ? "none" : "";
+        d._off = off;
+        d.style.transform = `translateX(calc(${off * 100}% + ${dx}px))`;
+        d.style.opacity = Math.abs(off) <= 1 ? 1 : 0;
+        d.style.pointerEvents = off === 0 ? "auto" : "none";
+        d.setAttribute("aria-hidden", off !== 0);
+      });
+      count.textContent = `${cur + 1} / ${n}`;
+    }
+    const go = d => { cur = (cur + d + n) % n; dx = 0; paint(); };
+    const end = () => {
+      if (!drag) return;
+      drag = false; stage.classList.remove("drag");
+      if (Math.abs(dx) > stage.clientWidth * .2) go(dx < 0 ? 1 : -1); else { dx = 0; paint(); }
+    };
+    if (n > 1){
+      stage.onpointerdown = e => { if (e.target.closest("video")) return; drag = true; x0 = e.clientX; dx = 0; stage.classList.add("drag"); stage.setPointerCapture(e.pointerId); };
+      stage.onpointermove = e => { if (drag){ dx = e.clientX - x0; paint(); } };
+      stage.onpointerup = end; stage.onpointercancel = end;
+      car.querySelector(".prev").onclick = () => go(-1);
+      car.querySelector(".next").onclick = () => go(1);
+      car.onkeydown = e => { if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1); };
+    }
+    paint();
+  }
+
   async function render(){
     if (!view) return;
     const items = await list(tab), g = $("grid");
     g.innerHTML = "";
     if (!items.length) g.innerHTML = `<div class="empty">Nothing in ${esc(tab)} yet.</div>`;
-    items.forEach(i => {
-      const f = document.createElement("figure");
-      f.innerHTML = i.type.startsWith("video") ? `<video src="${esc(i.url)}" controls preload="metadata"></video>` : `<img src="${esc(i.url)}" alt="" loading="lazy">`;
-      if (i.caption){ const c = document.createElement("figcaption"); c.textContent = i.caption; f.appendChild(c); }
-      g.appendChild(f);
-    });
+    if (items.length) carousel(g, items);
     for (const b of $("tabs").querySelectorAll("button")) b.querySelector("span").textContent = (await list(b.dataset.tab)).length;
   }
   window.onhashchange = route;
