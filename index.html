@@ -129,6 +129,20 @@ nav .menu{display:contents}
   nav.open .menu{display:flex}
   nav .menu button{text-align:left;border-radius:12px}
 }
+
+.acts .ico{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border-radius:50%}
+.acts .ico svg{display:block}
+
+dialog textarea{display:block;width:100%;margin-top:6px;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(10,7,32,.6);color:var(--ink);resize:vertical;min-height:110px}
+.fblist{max-height:55vh;overflow:auto;margin:0 0 14px;display:flex;flex-direction:column;gap:10px}
+.fbi{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.06);font-size:.92rem}
+.fbi b{color:var(--acc2)}
+.fbi small{display:block;color:var(--mute);margin:2px 0 6px}
+.fbi p{margin:0;white-space:pre-wrap;word-break:break-word}
+.fbi button{margin-top:8px;font-size:.8rem;padding:4px 10px}
+.fbempty{color:var(--mute);text-align:center;padding:18px 0}
+.acts .ico{position:relative}
+.badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--pink);color:#0a0720;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -187,6 +201,21 @@ nav .menu{display:contents}
   </form>
 </dialog>
 
+<dialog id="fbd">
+  <form id="fbForm">
+    <h2>Send feedback</h2>
+    <label>Your message<textarea id="fbText" rows="5" maxlength="1000" placeholder="Tell us what you think, or report a problem" required></textarea></label>
+    <p class="err" id="fbMsg"></p>
+    <div class="row"><button type="button" class="ghost" data-close>Close</button><button class="btn" id="fbGo">Send</button></div>
+  </form>
+</dialog>
+
+<dialog id="inbox">
+  <h2>Feedback</h2>
+  <div id="fbList" class="fblist"></div>
+  <div class="row"><button type="button" class="ghost" data-close>Close</button></div>
+</dialog>
+
 <dialog id="up">
   <form id="upForm">
     <h2>Add to the album</h2>
@@ -218,6 +247,8 @@ nav .menu{display:contents}
           allow write: if request.auth.uid==uid && getAfter(/databases/$(d)/documents/handles/$(request.resource.data.handleLower)).data.uid==request.auth.uid && (request.resource.data.handleLower!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
         match /handles/{h} { allow read: if true;
           allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid && (h!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
+        match /feedback/{id} { allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid && request.resource.data.text is string && request.resource.data.text.size()>0 && request.resource.data.text.size()<=1000;
+          allow read, delete: if request.auth!=null && request.auth.token.email=='clarencecabali.socmed@gmail.com'; }
         match /album/{id} { allow read: if true;
           allow create: if request.auth.uid==request.resource.data.uid && request.resource.data.url.size()<900000;
           allow update, delete: if request.auth.uid==resource.data.uid; } } }
@@ -357,15 +388,21 @@ function start(){
   async function loadMe(uid){
     const d = await db.collection("users").doc(uid).get();
     me = d.exists ? {uid, ...d.data()} : null; paintAuth();
+    if (me && isOwner()) refreshFb();
+    if (me && pendingFb){ pendingFb = false; if (!isOwner()) setTimeout(openFb, 350); }
   }
+  const isOwner = () => !!(auth.currentUser && auth.currentUser.email && auth.currentUser.email.toLowerCase() === OWNER_EMAIL.toLowerCase());
+  let fbCount = 0, pendingFb = false;
   function paintAuth(){
+    const fbBtn = `<button class="ghost ico" data-a="fb" aria-label="Send feedback" title="Feedback"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>`;
+    const inBtn = `<button class="ghost ico" data-a="inbox" aria-label="View feedback" title="Feedback inbox"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>${fbCount ? `<i class="badge">${fbCount > 99 ? "99+" : fbCount}</i>` : ""}</button>`;
     $("acts").innerHTML = me
-      ? `<button class="ghost" data-a="mine">@${esc(me.handle)}</button><button class="btn" data-a="add">Add</button><button class="ghost" data-a="out">Sign out</button>`
-      : `<button class="btn" data-a="in">Sign in</button>`;
+      ? `<button class="ghost" data-a="mine">@${esc(me.handle)}</button>${isOwner() ? inBtn : fbBtn}<button class="btn ico" data-a="add" aria-label="Add photo" title="Add"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="ghost ico" data-a="out" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>`
+      : `${fbBtn}<button class="btn" data-a="in">Sign in</button>`;
   }
   auth.onAuthStateChanged(u => u ? loadMe(u.uid) : (me = null, paintAuth()));
   $("acts").onclick = e => { const a = e.target.closest("button")?.dataset.a;
-    if (a === "in") openAuth(); else if (a === "add") openUpload();
+    if (a === "in"){ pendingFb = false; openAuth(); } else if (a === "fb") onFb(); else if (a === "inbox") openInbox(); else if (a === "add") openUpload();
     else if (a === "mine") location.hash = me.handle; else if (a === "out"){ auth.signOut().then(() => { me = null; paintAuth(); if (location.hash || location.search) { history.replaceState(null, "", location.pathname); } route(); }); } };
 
   let mode = "in";
@@ -502,6 +539,49 @@ function start(){
       } catch(e){}
     }, 400);
   });
+
+
+  /* ---- feedback: any signed-in user can send, only the owner can read ---- */
+  function openFb(){ $("fbText").value = ""; $("fbMsg").textContent = ""; $("fbGo").disabled = false; $("fbd").showModal(); $("fbText").focus(); }
+  function onFb(){
+    if (me) return openFb();
+    openAuth(); pendingFb = true;
+    $("authErr").textContent = "Please sign in to send feedback.";
+  }
+  $("fbForm").onsubmit = async e => {
+    e.preventDefault();
+    const text = $("fbText").value.trim(); if (!text || !me) return;
+    $("fbGo").disabled = true; $("fbMsg").textContent = "";
+    try {
+      await db.collection("feedback").add({uid: me.uid, handle: me.handle, text, date: Date.now()});
+      $("fbMsg").textContent = "Thank you! Your feedback was sent.";
+      $("fbText").value = "";
+      setTimeout(() => $("fbd").close(), 1400);
+    } catch(err){ $("fbMsg").textContent = "Could not send: " + friendly(err); $("fbGo").disabled = false; }
+  };
+  async function refreshFb(){
+    if (!isOwner()) return [];
+    try {
+      const q = await db.collection("feedback").orderBy("date", "desc").limit(200).get();
+      const items = q.docs.map(d => ({id: d.id, ...d.data()}));
+      fbCount = items.length; paintAuth(); return items;
+    } catch(err){ return null; }
+  }
+  async function openInbox(){
+    if (!isOwner()) return;
+    $("fbList").innerHTML = '<div class="fbempty">Loading...</div>'; $("inbox").showModal();
+    const items = await refreshFb();
+    if (items === null) { $("fbList").innerHTML = '<div class="fbempty">Could not load feedback. Check the Firestore rules.</div>'; return; }
+    drawFb(items);
+  }
+  function drawFb(items){
+    $("fbList").innerHTML = items.length ? items.map(i => `<div class="fbi"><b>@${esc(i.handle || "unknown")}</b><small>${esc(new Date(i.date).toLocaleString())}</small><p>${esc(i.text)}</p><button class="ghost" data-del="${esc(i.id)}">Delete</button></div>`).join("") : '<div class="fbempty">No feedback yet.</div>';
+  }
+  $("fbList").onclick = async e => {
+    const b = e.target.closest("button[data-del]"); if (!b || !isOwner()) return;
+    b.disabled = true;
+    try { await db.collection("feedback").doc(b.dataset.del).delete(); drawFb(await refreshFb() || []); } catch(err){ b.disabled = false; }
+  };
 
   route();
 }
