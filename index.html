@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Our Album</title>
+<meta name="theme-color" content="#140b3a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Our Album">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Our Album is a free place to create your own photo and memory albums, organize them into categories, and share them with friends and family.">
 <meta name="google-adsense-account" content="ca-pub-3070013351505360">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3070013351505360"
@@ -146,6 +151,124 @@ footer.site .info{margin:8px auto 0;padding:0}
 .cform input::placeholder{color:var(--mute)}
 .csign{margin:0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:.9rem}
 .smsg{margin:8px 0 0;color:var(--pink);font-size:.85rem;min-height:1.2em}
+/* ===== Glassmorphism layer ===== */
+:root{
+ --mute:#d6cff7;
+ --card:rgba(255,255,255,.10);
+ --line:rgba(255,255,255,.30);
+ --glass:linear-gradient(135deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.07) 55%,rgba(255,255,255,.12) 100%);
+ --glass-dark:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.06)),rgba(28,16,78,.38);
+ --blur:blur(26px) saturate(180%);
+ --edge:inset 0 1px 0 rgba(255,255,255,.55),inset 1px 0 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.08);
+ --lift:0 10px 34px rgba(12,6,50,.38);
+}
+body{background:radial-gradient(ellipse at 12% 0%,#5a3bff 0,transparent 55%),radial-gradient(ellipse at 92% 8%,#ff4fc3 0,transparent 42%),radial-gradient(ellipse at 85% 100%,#12b9de 0,transparent 55%),#140b3a}
+.aurora i{opacity:.75}
+.aurora i:nth-child(3){opacity:.55}
+header p{text-shadow:0 1px 12px rgba(10,5,40,.5)}
+
+/* frosted panels */
+nav .catBtn,.up,figure,.srch input,.sbar button,.cbox,.ghost,.stage,.empty,.nav,footer.site{
+ background:var(--glass);
+ -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+ border:1px solid var(--line);
+ box-shadow:var(--edge),var(--lift);
+}
+.empty{border-style:solid}
+.up{border-radius:26px;padding:18px}
+
+/* floating menus + dialogs: a touch darker so text stays readable */
+nav .menu,.res,dialog{
+ background:var(--glass-dark);
+ -webkit-backdrop-filter:blur(34px) saturate(190%);backdrop-filter:blur(34px) saturate(190%);
+ border:1px solid var(--line);
+ box-shadow:var(--edge),0 24px 70px rgba(8,3,40,.55);
+}
+dialog{border-radius:28px}
+dialog::backdrop{background:rgba(24,12,70,.35);-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%)}
+
+/* photo cards: photo inset inside a glass frame */
+figure{padding:10px;border-radius:26px}
+figure img,figure video{border-radius:18px}
+figcaption{padding:14px 8px 6px}
+figure:hover{box-shadow:var(--edge),0 22px 60px rgba(120,90,255,.45)}
+
+/* carousel */
+.stage{border-radius:28px}
+.slide p{background:linear-gradient(transparent,rgba(10,5,40,.7))}
+.nav{width:46px;height:46px}
+
+/* inputs: recessed glass */
+.up input[type=text],dialog input,dialog select,.cform input{
+ background:rgba(255,255,255,.09);
+ border:1px solid rgba(255,255,255,.28);
+ box-shadow:inset 0 2px 6px rgba(10,5,40,.28);
+}
+.srch input{background:var(--glass)}
+.up input:focus,dialog input:focus,dialog select:focus,.cform input:focus,.srch input:focus{
+ outline:none;border-color:rgba(255,255,255,.7);
+ box-shadow:inset 0 2px 6px rgba(10,5,40,.2),0 0 0 3px rgba(94,224,255,.35);
+}
+.up input[type=file]::file-selector-button{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32)}
+
+/* buttons keep their gradient, gain a glossy top edge */
+.btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 6px 22px rgba(255,122,217,.35)}
+.btn:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 8px 30px rgba(155,123,255,.65)}
+nav .catBtn[aria-expanded=true]{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 28px rgba(130,120,255,.6)}
+.sbar .lk.liked{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 22px rgba(255,122,217,.45)}
+.ghost:hover,.sbar button:hover{background:linear-gradient(135deg,rgba(255,255,255,.34),rgba(255,255,255,.12))}
+
+/* comments */
+.cm{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16)}
+
+/* footer as a glass bar */
+footer.site{width:calc(100% - 40px);margin:40px auto 30px;padding:22px 20px;border-radius:26px}
+
+/* fallbacks */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ nav .catBtn,.up,figure,.srch input,.sbar button,.cbox,.ghost,.stage,.empty,.nav,footer.site{background:rgba(40,26,100,.75)}
+ nav .menu,.res,dialog{background:rgba(28,18,76,.95)}
+}
+@media (prefers-reduced-transparency:reduce){
+ nav .catBtn,.up,figure,.srch input,.sbar button,.cbox,.ghost,.stage,.empty,.nav,footer.site,nav .menu,.res,dialog{
+  -webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(32,20,86,.92)}
+}
+/* ===== Install button (PWA) ===== */
+body{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+.pwa{position:fixed;z-index:60;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+ display:flex;align-items:stretch;max-width:calc(100vw - 24px);
+ border:1px solid var(--line);border-radius:999px;overflow:hidden;
+ background:var(--glass-dark);-webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%);
+ box-shadow:var(--edge),0 14px 44px rgba(8,3,40,.55),0 0 30px rgba(155,123,255,.35);
+ animation:pwaIn .5s cubic-bezier(.2,.8,.2,1) both}
+.pwa[hidden]{display:none}
+@keyframes pwaIn{from{opacity:0;transform:translate(-50%,24px)}to{opacity:1;transform:translate(-50%,0)}}
+.pwa .go{display:flex;align-items:center;gap:10px;font:inherit;font-weight:600;color:var(--ink);background:none;border:0;cursor:pointer;padding:10px 14px 10px 10px;min-height:48px;white-space:nowrap}
+.pwa .go img{width:30px;height:30px;border-radius:9px;flex:none;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.pwa .go small{display:block;font-weight:400;font-size:.74rem;color:var(--mute);line-height:1.1}
+.pwa .go span{display:block;line-height:1.2;text-align:left}
+.pwa .x{font:inherit;font-size:1.2rem;line-height:1;color:var(--mute);background:none;border:0;border-left:1px solid var(--line);padding:0 14px;min-width:44px;cursor:pointer}
+.pwa .go:hover,.pwa .x:hover{background:rgba(255,255,255,.12)}
+.pwa .x:hover{color:var(--ink)}
+
+.pwaSheet{width:min(94vw,420px);margin:auto auto max(12px,env(safe-area-inset-bottom,0px));padding:24px 22px 20px}
+.pwaSheet h2{margin:0 0 6px}
+.pwaSheet p{margin:0 0 14px;color:var(--mute);font-size:.95rem}
+.pwaSheet ol{margin:0 0 18px;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+.pwaSheet li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:16px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16)}
+.pwaSheet li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:#0a0720;background:linear-gradient(120deg,var(--acc),var(--acc2))}
+.pwaSheet .row{display:flex;justify-content:flex-end;margin:0}
+.pwaSheet svg{vertical-align:-4px}
+
+@media (min-width:768px){
+ .pwa{left:auto;right:max(24px,env(safe-area-inset-right,0px));bottom:max(24px,env(safe-area-inset-bottom,0px));transform:none;animation-name:pwaInD}
+ @keyframes pwaInD{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+ .pwaSheet{margin:auto}
+ body{padding-bottom:0}
+}
+@media (max-width:360px){.pwa .go small{display:none}.pwa .go{padding-right:10px}}
+@media (max-height:460px) and (orientation:landscape){.pwa{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:max(8px,env(safe-area-inset-bottom,0px));transform:none;animation:none}.pwa .go small{display:none}}
+@media (display-mode:standalone){.pwa{display:none!important}}
 </style>
 </head>
 <body>
@@ -591,6 +714,89 @@ function start(){
 
   route();
 }
+</script>
+<!-- Install app button -->
+<div class="pwa" id="pwa" hidden>
+  <button class="go" id="pwaGo" type="button" aria-label="Install Our Album as an app">
+    <img id="pwaIcon" alt="" width="30" height="30">
+    <span>Install app<small>Add Our Album to your device</small></span>
+  </button>
+  <button class="x" id="pwaX" type="button" aria-label="Hide install button">&times;</button>
+</div>
+<dialog id="pwaHelp" class="pwaSheet">
+  <h2>Install Our Album</h2>
+  <p id="pwaHelpIntro">Add it to your home screen to open it like an app.</p>
+  <ol id="pwaSteps"></ol>
+  <div class="row"><button type="button" class="btn" id="pwaOk">Got it</button></div>
+</dialog>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  var ua=navigator.userAgent, iOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  var evt=null, KEY="albumInstallHiddenUntil";
+  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+  /* app icon + manifest, built in the page so no extra files are needed */
+  function icon(n){
+    var c=document.createElement("canvas");c.width=c.height=n;var g=c.getContext("2d");
+    var bg=g.createLinearGradient(0,0,n,n);bg.addColorStop(0,"#ff7ad9");bg.addColorStop(.55,"#9b7bff");bg.addColorStop(1,"#5ee0ff");
+    g.fillStyle=bg;g.fillRect(0,0,n,n);
+    g.fillStyle="rgba(255,255,255,.28)";g.beginPath();g.arc(n*.3,n*.2,n*.45,0,7);g.fill();
+    g.fillStyle="#fff";var u=n/10;
+    g.beginPath();g.roundRect?g.roundRect(2*u,2.8*u,6*u,4.8*u,.8*u):g.rect(2*u,2.8*u,6*u,4.8*u);g.fill();
+    g.fillStyle="#7b4dff";g.beginPath();g.arc(5*u,5.2*u,1.45*u,0,7);g.fill();
+    g.fillStyle="#fff";g.fillRect(3.4*u,2.2*u,1.6*u,.8*u);
+    return c.toDataURL("image/png");
+  }
+  try{
+    var i192=icon(192),i512=icon(512),i180=icon(180);
+    $("pwaIcon").src=i192;
+    var base=location.origin+location.pathname.replace(/[^\/]*$/,"");
+    var man={name:"Our Album",short_name:"Album",description:"Photo and memory albums.",
+      start_url:location.origin+location.pathname,scope:base,display:"standalone",
+      background_color:"#140b3a",theme_color:"#140b3a",
+      icons:[{src:i192,sizes:"192x192",type:"image/png",purpose:"any"},{src:i512,sizes:"512x512",type:"image/png",purpose:"any"},{src:i512,sizes:"512x512",type:"image/png",purpose:"maskable"}]};
+    var l=document.createElement("link");l.rel="manifest";
+    l.href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:"application/manifest+json"}));
+    document.head.appendChild(l);
+    var a=document.createElement("link");a.rel="apple-touch-icon";a.href=i180;document.head.appendChild(a);
+  }catch(e){}
+
+  var bar=$("pwa");
+  function hiddenByUser(){var t=+store(KEY);return t&&Date.now()<t}
+  function show(){if(!standalone&&!hiddenByUser())bar.hidden=false}
+
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();evt=e;show()});
+  window.addEventListener("appinstalled",function(){bar.hidden=true;evt=null});
+
+  function steps(list,intro){
+    $("pwaHelpIntro").textContent=intro;
+    $("pwaSteps").innerHTML=list.map(function(t){return"<li><span>"+t+"</span></li>"}).join("");
+    $("pwaHelp").showModal();
+  }
+  var shareIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+
+  $("pwaGo").onclick=function(){
+    if(evt){
+      evt.prompt();
+      evt.userChoice.then(function(r){if(r.outcome==="accepted")bar.hidden=true;evt=null});
+    }else if(iOS){
+      steps(["Tap the Share button "+shareIcon+" in Safari\u2019s toolbar.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. Our Album now opens like an app."],"Safari installs apps from the Share menu.");
+    }else{
+      steps(["Open your browser\u2019s menu (\u22EE or \u2630).","Choose <b>Install app</b> or <b>Add to Home screen</b>.","Confirm, and Our Album will open like an app."],"This browser doesn\u2019t offer a one-tap install, but you can still add it.");
+    }
+  };
+  $("pwaOk").onclick=function(){$("pwaHelp").close()};
+  $("pwaHelp").addEventListener("click",function(e){if(e.target===this)this.close()});
+  $("pwaX").onclick=function(){bar.hidden=true;store(KEY,String(Date.now()+7*864e5))};
+
+  /* iOS never fires beforeinstallprompt; other browsers that don't either still get the button */
+  if(!standalone){
+    if(iOS)show();
+    else setTimeout(function(){if(!evt)show()},2500);
+  }
+})();
 </script>
 </body>
 </html>
