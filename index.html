@@ -4,11 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Our Album</title>
-<meta name="theme-color" content="#140b3a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Our Album">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Our Album is a free place to create your own photo and memory albums, organize them into categories, and share them with friends and family.">
 <meta name="google-adsense-account" content="ca-pub-3070013351505360">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3070013351505360"
@@ -151,131 +146,69 @@ footer.site .info{margin:8px auto 0;padding:0}
 .cform input::placeholder{color:var(--mute)}
 .csign{margin:0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:.9rem}
 .smsg{margin:8px 0 0;color:var(--pink);font-size:.85rem;min-height:1.2em}
-/* ===== Glassmorphism layer ===== */
-:root{
- --mute:#d6cff7;
- --card:rgba(255,255,255,.10);
- --line:rgba(255,255,255,.30);
- --glass:linear-gradient(135deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.07) 55%,rgba(255,255,255,.12) 100%);
- --glass-dark:linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.06)),rgba(28,16,78,.38);
- --blur:blur(26px) saturate(180%);
- --edge:inset 0 1px 0 rgba(255,255,255,.55),inset 1px 0 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.08);
- --lift:0 10px 34px rgba(12,6,50,.38);
-}
-body{background:radial-gradient(ellipse at 12% 0%,#5a3bff 0,transparent 55%),radial-gradient(ellipse at 92% 8%,#ff4fc3 0,transparent 42%),radial-gradient(ellipse at 85% 100%,#12b9de 0,transparent 55%),#140b3a}
-.aurora i{opacity:.75}
-.aurora i:nth-child(3){opacity:.55}
-header p{text-shadow:0 1px 12px rgba(10,5,40,.5)}
 
-/* frosted panels */
-nav .catBtn,.up,figure,.srch input,.sbar button,.cbox,.ghost,.stage,.empty,.nav,footer.site{
- background:var(--glass);
- -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
- border:1px solid var(--line);
- box-shadow:var(--edge),var(--lift);
-}
-.empty{border-style:solid}
-.up{border-radius:26px;padding:18px}
+/* loading screen + install */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at 50% -10%,#2a1a63 0,transparent 60%),var(--bg);transition:opacity .45s ease,visibility .45s}
+#splash.off{opacity:0;visibility:hidden;pointer-events:none}
+#splash .ring{width:58px;height:58px;border-radius:50%;border:4px solid rgba(255,255,255,.14);border-top-color:var(--acc2);border-right-color:var(--pink);animation:spin .9s linear infinite}
+#splash b{font:italic 400 1.9rem Georgia,"Times New Roman",serif;background:linear-gradient(100deg,#fff 10%,#c9b8ff 45%,var(--acc2) 75%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+#splash span{color:var(--mute);font-size:.95rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+#installBtn{display:none}
+#installBtn.show{display:inline-block}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);z-index:10001;max-width:min(90vw,380px);padding:12px 18px;border-radius:14px;background:rgba(20,14,50,.95);border:1px solid var(--line);color:var(--ink);font-size:.92rem;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 
-/* floating menus + dialogs: a touch darker so text stays readable */
-nav .menu,.res,dialog{
- background:var(--glass-dark);
- -webkit-backdrop-filter:blur(34px) saturate(190%);backdrop-filter:blur(34px) saturate(190%);
- border:1px solid var(--line);
- box-shadow:var(--edge),0 24px 70px rgba(8,3,40,.55);
-}
-dialog{border-radius:28px}
-dialog::backdrop{background:rgba(24,12,70,.35);-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%)}
-
-/* photo cards: photo inset inside a glass frame */
-figure{padding:10px;border-radius:26px}
-figure img,figure video{border-radius:18px}
-figcaption{padding:14px 8px 6px}
-figure:hover{box-shadow:var(--edge),0 22px 60px rgba(120,90,255,.45)}
-
-/* carousel */
-.stage{border-radius:28px}
-.slide p{background:linear-gradient(transparent,rgba(10,5,40,.7))}
-.nav{width:46px;height:46px}
-
-/* inputs: recessed glass */
-.up input[type=text],dialog input,dialog select,.cform input{
- background:rgba(255,255,255,.09);
- border:1px solid rgba(255,255,255,.28);
- box-shadow:inset 0 2px 6px rgba(10,5,40,.28);
-}
-.srch input{background:var(--glass)}
-.up input:focus,dialog input:focus,dialog select:focus,.cform input:focus,.srch input:focus{
- outline:none;border-color:rgba(255,255,255,.7);
- box-shadow:inset 0 2px 6px rgba(10,5,40,.2),0 0 0 3px rgba(94,224,255,.35);
-}
-.up input[type=file]::file-selector-button{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32)}
-
-/* buttons keep their gradient, gain a glossy top edge */
-.btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 6px 22px rgba(255,122,217,.35)}
-.btn:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 8px 30px rgba(155,123,255,.65)}
-nav .catBtn[aria-expanded=true]{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 28px rgba(130,120,255,.6)}
-.sbar .lk.liked{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 22px rgba(255,122,217,.45)}
-.ghost:hover,.sbar button:hover{background:linear-gradient(135deg,rgba(255,255,255,.34),rgba(255,255,255,.12))}
-
-/* comments */
-.cm{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16)}
-
-/* footer as a glass bar */
-footer.site{width:calc(100% - 40px);margin:40px auto 30px;padding:22px 20px;border-radius:26px}
-
-/* fallbacks */
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
- nav .catBtn,.up,figure,.srch input,.sbar button,.cbox,.ghost,.stage,.empty,.nav,footer.site{background:rgba(40,26,100,.75)}
- nav .menu,.res,dialog{background:rgba(28,18,76,.95)}
-}
-@media (prefers-reduced-transparency:reduce){
- nav .catBtn,.up,figure,.srch input,.sbar button,.cbox,.ghost,.stage,.empty,.nav,footer.site,nav .menu,.res,dialog{
-  -webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(32,20,86,.92)}
-}
-/* ===== Install button (PWA) ===== */
-body{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-.pwa{position:fixed;z-index:60;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);
- display:flex;align-items:stretch;max-width:calc(100vw - 24px);
- border:1px solid var(--line);border-radius:999px;overflow:hidden;
- background:var(--glass-dark);-webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%);
- box-shadow:var(--edge),0 14px 44px rgba(8,3,40,.55),0 0 30px rgba(155,123,255,.35);
- animation:pwaIn .5s cubic-bezier(.2,.8,.2,1) both}
-.pwa[hidden]{display:none}
-@keyframes pwaIn{from{opacity:0;transform:translate(-50%,24px)}to{opacity:1;transform:translate(-50%,0)}}
-.pwa .go{display:flex;align-items:center;gap:10px;font:inherit;font-weight:600;color:var(--ink);background:none;border:0;cursor:pointer;padding:10px 14px 10px 10px;min-height:48px;white-space:nowrap}
-.pwa .go img{width:30px;height:30px;border-radius:9px;flex:none;box-shadow:0 2px 10px rgba(0,0,0,.35)}
-.pwa .go small{display:block;font-weight:400;font-size:.74rem;color:var(--mute);line-height:1.1}
-.pwa .go span{display:block;line-height:1.2;text-align:left}
-.pwa .x{font:inherit;font-size:1.2rem;line-height:1;color:var(--mute);background:none;border:0;border-left:1px solid var(--line);padding:0 14px;min-width:44px;cursor:pointer}
-.pwa .go:hover,.pwa .x:hover{background:rgba(255,255,255,.12)}
-.pwa .x:hover{color:var(--ink)}
-
-.pwaSheet{width:min(94vw,420px);margin:auto auto max(12px,env(safe-area-inset-bottom,0px));padding:24px 22px 20px}
-.pwaSheet h2{margin:0 0 6px}
-.pwaSheet p{margin:0 0 14px;color:var(--mute);font-size:.95rem}
-.pwaSheet ol{margin:0 0 18px;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
-.pwaSheet li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:16px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16)}
-.pwaSheet li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:#0a0720;background:linear-gradient(120deg,var(--acc),var(--acc2))}
-.pwaSheet .row{display:flex;justify-content:flex-end;margin:0}
-.pwaSheet svg{vertical-align:-4px}
-
-@media (min-width:768px){
- .pwa{left:auto;right:max(24px,env(safe-area-inset-right,0px));bottom:max(24px,env(safe-area-inset-bottom,0px));transform:none;animation-name:pwaInD}
- @keyframes pwaInD{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
- .pwaSheet{margin:auto}
- body{padding-bottom:0}
-}
-@media (max-width:360px){.pwa .go small{display:none}.pwa .go{padding-right:10px}}
-@media (max-height:460px) and (orientation:landscape){.pwa{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:max(8px,env(safe-area-inset-bottom,0px));transform:none;animation:none}.pwa .go small{display:none}}
-@media (display-mode:standalone){.pwa{display:none!important}}
+/* ---- new features ---- */
+html,body{overscroll-behavior-y:contain}
+dialog .row{flex-wrap:wrap}
+dialog input[type=radio]{display:inline-block;width:auto;margin:0;accent-color:#9b7bff}
+.ok{color:#7dffb3!important}
+#grid{transition:opacity .17s ease,transform .17s ease}
+#grid.out{opacity:0;transform:translateY(10px)}
+#grid.in{animation:tabin .4s ease both}
+@keyframes tabin{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px auto 0}
+.tools .ghost{padding:8px 16px;font-size:.92rem}
+#ptr{position:fixed;top:0;left:50%;z-index:5;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--ink);background:rgba(30,20,80,.92);border:1px solid var(--line);box-shadow:0 6px 20px rgba(0,0,0,.4);transform:translate(-50%,-60px);opacity:0;pointer-events:none}
+#ptr.spin{animation:spin .8s linear infinite;transition:none}
+#lb{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;background:rgba(5,3,20,.97)}
+#lb[hidden]{display:none!important}
+.lbtop{display:flex;align-items:center;gap:8px;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));color:var(--mute)}
+.lbtop .sp{flex:1}
+.lbtop button,.lbn{font:inherit;color:var(--ink);border:1px solid var(--line);background:rgba(255,255,255,.1);border-radius:999px;padding:8px 16px;cursor:pointer}
+#lbBox{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#lbImg{max-width:100%;max-height:100%;object-fit:contain;will-change:transform;-webkit-user-drag:none}
+.lbn{position:absolute;top:50%;width:46px;height:46px;padding:0;font-size:1.6rem;line-height:1;transform:translateY(-50%)}
+.lbn.prev{left:12px}.lbn.next{right:12px}
+#lbCap{margin:0;padding:12px 18px;padding-bottom:max(14px,env(safe-area-inset-bottom));text-align:center;color:var(--ink);min-height:1em}
+#roList{max-height:50vh;overflow:auto;margin:0 0 10px}
+.ro{display:flex;gap:12px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.06);margin-bottom:8px}
+.ro.drag{background:rgba(155,123,255,.35);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ro img{width:56px;height:56px;object-fit:cover;border-radius:10px;flex:none}
+.ro .rt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mute);font-size:.9rem}
+.grip{touch-action:none;cursor:grab;padding:12px 8px;font-size:1.2rem;line-height:1;color:var(--mute);user-select:none;-webkit-user-select:none}
+.pvopt{display:flex!important;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.05);cursor:pointer}
+.pvopt span{display:flex;flex-direction:column;color:var(--ink)}
+.pvopt small{color:var(--mute)}
+.fr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;margin-bottom:6px;border:1px solid var(--line);border-radius:12px;color:var(--ink)}
+.fr button{font:inherit;border:0;background:none;color:var(--pink);cursor:pointer}
 </style>
 </head>
 <body>
+<div id="splash" role="status" aria-live="polite"><div class="ring"></div><b>Our Album</b><span id="splashMsg">Loading…</span></div>
+<div id="toast" role="status"></div>
+<div id="ptr" aria-hidden="true">&#8635;</div>
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <div class="lbtop"><span id="lbCount"></span><span class="sp"></span><button type="button" id="lbShare">Share</button><button type="button" id="lbDl">Download</button><button type="button" id="lbX" aria-label="Close">&#10005;</button></div>
+  <div id="lbBox"><img id="lbImg" alt="" draggable="false"></div>
+  <button type="button" class="lbn prev" id="lbPrev" aria-label="Previous picture">&#8249;</button><button type="button" class="lbn next" id="lbNext" aria-label="Next picture">&#8250;</button>
+  <p id="lbCap"></p>
+</div>
 <div class="aurora"><i></i><i></i><i></i></div><div class="stars"></div><div id="pbg"></div><div id="fbg"></div><div id="gbg"></div>
 <div class="top">
   <div class="srch"><input type="search" id="q" placeholder="Search accounts" aria-label="Search accounts" autocomplete="off"><div class="res" id="res" hidden></div></div>
-  <div class="acts" id="acts"></div>
+  <div class="acts"><button class="ghost" id="installBtn" type="button">⬇ Install</button><span class="acts" id="acts"></span></div>
 </div>
 <header>
   <h1 id="title">Our Album</h1>
@@ -313,7 +246,7 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
     <label>Email<input type="email" id="email" required autocomplete="email"></label>
     <label>Password<input type="password" id="apw" required minlength="6" autocomplete="current-password"></label>
     <p class="err" id="authErr"></p>
-    <div class="row"><button type="button" class="ghost" id="swap"></button></div>
+    <div class="row"><button type="button" class="ghost" id="swap"></button><button type="button" class="ghost" id="forgot">Forgot password?</button></div>
     <div class="row"><button type="button" class="ghost" data-close>Cancel</button><button class="btn" id="authGo">Sign in</button></div>
   </form>
 </dialog>
@@ -342,6 +275,41 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
   </form>
 </dialog>
 
+<dialog id="ed">
+  <form id="edForm">
+    <h2>Edit photo</h2>
+    <label>Caption<input type="text" id="edCap" maxlength="160" placeholder="Write a caption"></label>
+    <label>Category<select id="edCat"></select></label>
+    <p class="note" id="edMsg"></p>
+    <div class="row"><button type="button" class="ghost" id="edDel">Delete</button><button type="button" class="ghost" data-close>Cancel</button><button class="btn" id="edGo">Save</button></div>
+  </form>
+</dialog>
+
+<dialog id="ro">
+  <form id="roForm">
+    <h2 id="roTitle">Reorder</h2>
+    <p class="note">Press and hold the &#8942;&#8942; handle, then drag a photo up or down.</p>
+    <div id="roList"></div>
+    <p class="note" id="roMsg"></p>
+    <div class="row"><button type="button" class="ghost" data-close>Cancel</button><button class="btn" id="roGo">Save order</button></div>
+  </form>
+</dialog>
+
+<dialog id="pv">
+  <form id="pvForm">
+    <h2>Who can see my album?</h2>
+    <label class="pvopt"><input type="radio" name="pvm" value="public"><span><b>Public</b><small>Anyone with the link</small></span></label>
+    <label class="pvopt"><input type="radio" name="pvm" value="friends"><span><b>Friends only</b><small>You and the accounts you add below</small></span></label>
+    <label class="pvopt"><input type="radio" name="pvm" value="private"><span><b>Only me</b><small>Hidden from everyone else</small></span></label>
+    <div id="pvFriends" hidden>
+      <div class="row"><input type="text" id="pvName" placeholder="Add a username" maxlength="20" aria-label="Add a friend by username" autocomplete="off"><button type="button" class="ghost" id="pvAdd">Add</button></div>
+      <div id="pvList"></div>
+    </div>
+    <p class="note" id="pvMsg"></p>
+    <div class="row"><button type="button" class="ghost" data-close>Done</button></div>
+  </form>
+</dialog>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -352,19 +320,8 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
    3. Firebase console > Authentication > Users > Add user: use the OWNER_EMAIL below and the password you want for uploads.
       Then click the page title 5 times on the site, enter that password, and the upload window opens.
       Your album is the default page for everyone, unless they search for or open another account.
-   4. Firestore rules (replace clarencecabali.socmed@gmail.com with your OWNER_EMAIL; keep OWNER_HANDLE as "owner" or change 'owner' here too):
-      rules_version='2'; service cloud.firestore { match /databases/{d}/documents {
-        match /users/{uid} { allow read: if true;
-          allow write: if request.auth.uid==uid && getAfter(/databases/$(d)/documents/handles/$(request.resource.data.handleLower)).data.uid==request.auth.uid && (request.resource.data.handleLower!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
-        match /handles/{h} { allow read: if true;
-          allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid && (h!='owner' || request.auth.token.email=='clarencecabali.socmed@gmail.com'); }
-        match /album/{id} { allow read: if true;
-          allow create: if request.auth.uid==request.resource.data.uid && request.resource.data.url.size()<900000;
-          allow update, delete: if request.auth.uid==resource.data.uid;
-          match /likes/{uid} { allow read: if true; allow create, update, delete: if request.auth!=null && request.auth.uid==uid; }
-          match /comments/{cid} { allow read: if true;
-            allow create: if request.auth!=null && request.resource.data.uid==request.auth.uid && request.resource.data.text.size()>0 && request.resource.data.text.size()<=300;
-            allow delete: if request.auth!=null && (request.auth.uid==resource.data.uid || request.auth.uid==get(/databases/$(d)/documents/album/$(id)).data.uid); } } } }
+   4. Firestore rules: paste the full contents of firestore.rules (shipped next to this file) into Firebase console > Firestore > Rules > Publish.
+      They add private / friends-only albums. If you use another owner email, replace clarencecabali.socmed@gmail.com in them.
    5. Photos only (about 1000 px wide); videos are not supported without Firebase Storage.
    Links: yourpage.html opens the OWNER_HANDLE album; yourpage.html#name opens another account. */
 const FIREBASE_CONFIG = {
@@ -391,7 +348,9 @@ if (!FIREBASE_CONFIG) {
 function start(){
   firebase.initializeApp(FIREBASE_CONFIG);
   const auth = firebase.auth(), db = firebase.firestore();
-  const friendly = e => ({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email already has an account.","auth/weak-password":"Use at least 6 characters.","auth/invalid-email":"Enter a valid email.","auth/user-not-found":"The owner login has not been created in Firebase Authentication yet."}[e.code] || e.message);
+  const hideLater = () => window.hideSplash ? window.hideSplash() : setTimeout(hideLater, 30);
+  db.enablePersistence({synchronizeTabs:true}).catch(() => {}); /* keeps the last-loaded photos available offline */
+  const friendly = e => ({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email already has an account.","auth/weak-password":"Use at least 6 characters.","auth/invalid-email":"Enter a valid email.","auth/user-not-found":"The owner login has not been created in Firebase Authentication yet.","auth/too-many-requests":"Too many tries. Please wait a moment and try again."}[e.code] || e.message);
 
   /* ---- viewing an album ---- */
   async function getUser(handle){
@@ -403,17 +362,31 @@ function start(){
   async function route(){
     const p = new URLSearchParams(location.search);
     const handle = decodeURIComponent(location.hash.slice(1)) || p.get("u") || OWNER_HANDLE;
-    let u = await getUser(handle);
+    lockedView = false;
+    let u; try { u = await getUser(handle); } catch(e){ return locked({handle}, e); }
     if (!u && handle.toLowerCase() === OWNER_HANDLE.toLowerCase()) u = {uid:null, handle:OWNER_HANDLE, cats:DEFAULT_CATS.slice()};
     if (!u){ view = null; TABS = []; drawTabs(); $("sub").textContent = ""; $("grid").innerHTML = `<div class="empty">No account named ${esc(handle)}.</div>`; return; }
-    view = u; TABS = u.cats && u.cats.length ? u.cats : DEFAULT_CATS.slice(); tab = TABS[0]; await loadItems();
+    view = u; TABS = u.cats && u.cats.length ? u.cats : DEFAULT_CATS.slice(); tab = TABS[0]; try { await loadItems(); } catch(e){ return locked(u, e); }
     $("sub").textContent = u.handle.toLowerCase() === OWNER_HANDLE.toLowerCase() ? "Every moment, kept in its own little universe." : `@${u.handle}'s album`;
+    if (u.privacy && u.privacy !== "public") $("sub").textContent += " \u00b7 \ud83d\udd12 " + (u.privacy === "friends" ? "Friends only" : "Only me");
     drawTabs(); render();
   }
+  let lockedView = false;
+  function locked(u, e){
+    view = null; TABS = []; lockedView = true; stopSocial(); drawTabs();
+    $("sub").textContent = u.handle ? `@${u.handle}'s album` : "";
+    const denied = e && e.code === "permission-denied";
+    $("grid").classList.remove("out");
+    $("grid").innerHTML = denied
+      ? `<div class="empty">\ud83d\udd12 ${u.privacy === "friends" ? "This album is for friends only. Sign in with an account the owner has added." : "This album is private."}</div>`
+      : `<div class="empty">Couldn't load this album. Check your connection, then pull down to try again.</div>`;
+    hideLater();
+  }
+  const byOrder = (a, b) => (a.order ?? -a.date) - (b.order ?? -b.date);
   async function loadItems(){
     if (!view.uid){ view.items = []; return; }
     const s = await db.collection("album").where("uid","==",view.uid).get();
-    view.items = s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => b.date - a.date);
+    view.items = s.docs.map(d => ({id:d.id, ...d.data()})).sort(byOrder);
   }
   const list = t => view.items.filter(i => i.tab === t);
   function drawTabs(){
@@ -430,15 +403,15 @@ function start(){
   $("tabs").onclick = e => {
     if (e.target.closest(".catBtn")){ const m = $("tabs").querySelector(".menu"); setMenu(m.hidden); return; }
     const b = e.target.closest(".menu button");
-    if (b){ tab = b.dataset.tab; drawTabs(); render(); }
+    if (b){ if (b.dataset.tab === tab){ setMenu(false); return; } $("grid").classList.add("out"); setMenu(false); setTimeout(() => { tab = b.dataset.tab; drawTabs(); render(); }, 170); }
   };
   document.addEventListener("click", e => { if (!e.target.closest("#tabs")) setMenu(false); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") setMenu(false); });
   /* ---- looping swipe carousel: one picture at a time ---- */
   function carousel(g, items){
     const n = items.length, half = Math.floor(n / 2);
-    let cur = 0, dx = 0, x0 = 0, drag = false;
-    g.innerHTML = `<div class="car" tabindex="0" aria-roledescription="carousel"><div class="stage"></div>${n > 1 ? '<button class="nav prev" aria-label="Previous picture">&#8249;</button><button class="nav next" aria-label="Next picture">&#8250;</button>' : ""}<div class="count"></div></div><div class="social"></div>`;
+    let cur = 0, dx = 0, x0 = 0, drag = false, moved = false;
+    g.innerHTML = `<div class="car" tabindex="0" aria-roledescription="carousel"><div class="stage"></div>${n > 1 ? '<button class="nav prev" aria-label="Previous picture">&#8249;</button><button class="nav next" aria-label="Next picture">&#8250;</button>' : ""}<div class="count"></div></div><div class="tools"></div><div class="social"></div>`;
     const car = g.firstChild, stage = car.querySelector(".stage"), count = car.querySelector(".count");
     const slides = items.map(i => {
       const d = document.createElement("div"); d.className = "slide";
@@ -460,26 +433,40 @@ function start(){
       });
       count.textContent = `${cur + 1} / ${n}`;
     }
-    const go = d => { cur = (cur + d + n) % n; dx = 0; paint(); showSocial(items[cur], g.querySelector(".social")); };
+    const setCur = k => { cur = k; dx = 0; paint(); showSocial(items[cur], g.querySelector(".social")); };
+    const go = d => setCur((cur + d + n) % n);
     const end = () => {
       if (!drag) return;
       drag = false; stage.classList.remove("drag");
       if (Math.abs(dx) > stage.clientWidth * .2) go(dx < 0 ? 1 : -1); else { dx = 0; paint(); }
     };
     if (n > 1){
-      stage.onpointerdown = e => { if (e.target.closest("video")) return; drag = true; x0 = e.clientX; dx = 0; stage.classList.add("drag"); stage.setPointerCapture(e.pointerId); };
-      stage.onpointermove = e => { if (drag){ dx = e.clientX - x0; paint(); } };
+      stage.onpointerdown = e => { if (e.target.closest("video")) return; drag = true; moved = false; x0 = e.clientX; dx = 0; stage.classList.add("drag"); stage.setPointerCapture(e.pointerId); };
+      stage.onpointermove = e => { if (drag){ dx = e.clientX - x0; if (Math.abs(dx) > 6) moved = true; paint(); } };
       stage.onpointerup = end; stage.onpointercancel = end;
       car.querySelector(".prev").onclick = () => go(-1);
       car.querySelector(".next").onclick = () => go(1);
       car.onkeydown = e => { if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1); };
     }
+    stage.onclick = e => { if (moved || e.target.closest("video")) return; openLb(items, cur, setCur); };
+    const tools = g.querySelector(".tools");
+    function drawTools(){
+      const mine = !!me && !!view && view.uid === me.uid;
+      tools.innerHTML = `<button type="button" class="ghost" data-t="share">Share</button><button type="button" class="ghost" data-t="dl">Download</button>` +
+        (mine ? `<button type="button" class="ghost" data-t="edit">Edit</button>${n > 1 ? `<button type="button" class="ghost" data-t="order">Reorder</button>` : ""}` : "");
+    }
+    tools.onclick = e => {
+      const t = e.target.closest("button")?.dataset.t; if (!t) return;
+      if (t === "share") sharePhoto(items[cur]); else if (t === "dl") downloadPhoto(items[cur]);
+      else if (t === "edit") openEdit(items[cur]); else if (t === "order") openReorder();
+    };
+    toolsRefresh = drawTools; drawTools();
     paint();
     showSocial(items[cur], g.querySelector(".social"));
   }
 
   /* ---- likes & comments (sign-in required to post) ---- */
-  let unsubs = [], socialRefresh = null;
+  let unsubs = [], socialRefresh = null, toolsRefresh = null;
   function stopSocial(){ unsubs.forEach(f => f()); unsubs = []; socialRefresh = null; }
   function showSocial(item, box){
     stopSocial();
@@ -539,11 +526,12 @@ function start(){
 
   async function render(){
     if (!view) return;
-    stopSocial();
+    stopSocial(); toolsRefresh = null;
     const items = await list(tab), g = $("grid");
     g.innerHTML = "";
     if (!items.length) g.innerHTML = `<div class="empty">Nothing in ${esc(tab)} yet.</div>`;
     if (items.length) carousel(g, items);
+    g.classList.remove("out", "in"); void g.offsetWidth; g.classList.add("in");
     for (const b of $("tabs").querySelectorAll(".menu button")) b.querySelector("span").textContent = (await list(b.dataset.tab)).length;
   }
   window.onhashchange = route;
@@ -568,18 +556,19 @@ function start(){
   }
   function paintAuth(){
     $("acts").innerHTML = me
-      ? `<button class="ghost" data-a="mine">@${esc(me.handle)}</button><button class="btn" data-a="add">Add</button><button class="ghost" data-a="out">Sign out</button>`
+      ? `<button class="ghost" data-a="mine">@${esc(me.handle)}</button><button class="btn" data-a="add">Add</button><button class="ghost" data-a="privacy">Privacy</button><button class="ghost" data-a="out">Sign out</button>`
       : `<button class="btn" data-a="in">Sign in</button>`;
     if (socialRefresh) socialRefresh();
+    if (toolsRefresh) toolsRefresh();
   }
-  auth.onAuthStateChanged(u => u ? loadMe(u.uid) : (me = null, paintAuth()));
+  auth.onAuthStateChanged(async u => { if (u) await loadMe(u.uid); else { me = null; paintAuth(); } if (lockedView) route(); });
   $("acts").onclick = e => { const a = e.target.closest("button")?.dataset.a;
-    if (a === "in") openAuth(); else if (a === "add") openUpload();
+    if (a === "in") openAuth(); else if (a === "add") openUpload(); else if (a === "privacy") openPrivacy();
     else if (a === "mine") location.hash = me.handle; else if (a === "out"){ auth.signOut().then(() => { me = null; paintAuth(); if (location.hash || location.search) { history.replaceState(null, "", location.pathname); } route(); }); } };
 
   let mode = "in";
   function setMode(m){
-    mode = m; $("hWrap").hidden = m === "in"; $("authErr").textContent = "";
+    mode = m; $("hWrap").hidden = m === "in"; $("authErr").textContent = ""; $("authErr").classList.remove("ok"); $("forgot").hidden = m !== "in";
     $("authTitle").textContent = m === "in" ? "Sign in" : "Create account";
     $("authGo").textContent = m === "in" ? "Sign in" : "Create account";
     $("swap").textContent = m === "in" ? "New here? Create an account" : "Have an account? Sign in";
@@ -588,7 +577,7 @@ function start(){
   function openAuth(note){ setMode("in"); $("authForm").reset(); if (typeof note === "string") $("authErr").textContent = note; $("auth").showModal(); }
   $("swap").onclick = () => setMode(mode === "in" ? "up" : "in");
   $("authForm").onsubmit = async e => {
-    e.preventDefault(); $("authGo").disabled = true; $("authErr").textContent = "";
+    e.preventDefault(); $("authGo").disabled = true; $("authErr").textContent = ""; $("authErr").classList.remove("ok");
     try {
       const email = $("email").value.trim(), pw = $("apw").value;
       if (mode === "in") await auth.signInWithEmailAndPassword(email, pw);
@@ -712,90 +701,312 @@ function start(){
     }, 400);
   });
 
-  route();
+
+  /* ---- forgot password ---- */
+  $("forgot").onclick = async () => {
+    const email = $("email").value.trim(), err = $("authErr"); err.classList.remove("ok");
+    if (!email){ err.textContent = "Type your email above first, then tap Forgot password."; return; }
+    $("forgot").disabled = true;
+    try { await auth.sendPasswordResetEmail(email); }
+    catch(e){ if (e.code !== "auth/user-not-found"){ err.textContent = friendly(e); $("forgot").disabled = false; return; } }
+    err.classList.add("ok"); err.textContent = "If that email has an account, a reset link is on its way. Check your spam folder too.";
+    $("forgot").disabled = false;
+  };
+
+  /* ---- edit a photo: caption, category, delete ---- */
+  let editing = null;
+  function openEdit(it){
+    if (!it || !it.id || !me) return;
+    editing = it; $("edCap").value = it.caption || "";
+    $("edCat").innerHTML = [...new Set([...me.cats, it.tab])].map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
+    $("edCat").value = it.tab; $("edMsg").textContent = ""; $("ed").showModal();
+  }
+  $("edForm").onsubmit = async e => {
+    e.preventDefault(); if (!editing) return;
+    $("edGo").disabled = true; $("edMsg").textContent = "Saving…";
+    try {
+      const cat = $("edCat").value, upd = {caption: $("edCap").value.trim()};
+      if (cat !== editing.tab){ upd.tab = cat; upd.order = firebase.firestore.FieldValue.delete(); }
+      await db.collection("album").doc(editing.id).update(upd);
+      $("ed").close(); await loadItems(); tab = cat; drawTabs(); render(); toast("Saved ✓");
+    } catch(err){ $("edMsg").textContent = "Could not save: " + (err.code === "permission-denied" ? "not allowed." : err.message); }
+    $("edGo").disabled = false;
+  };
+  $("edDel").onclick = async () => {
+    if (!editing || !confirm("Delete this photo? This can't be undone.")) return;
+    try { await db.collection("album").doc(editing.id).delete(); $("ed").close(); await loadItems(); drawTabs(); render(); toast("Photo deleted"); }
+    catch(err){ $("edMsg").textContent = "Could not delete: " + err.message; }
+  };
+
+  /* ---- drag to reorder ---- */
+  function openReorder(){
+    if (!me || !view || view.uid !== me.uid) return;
+    const its = list(tab); if (its.length < 2){ toast("Add at least two photos to reorder."); return; }
+    $("roTitle").textContent = "Reorder · " + tab;
+    $("roList").innerHTML = its.map(it => `<div class="ro" data-id="${esc(it.id)}"><span class="grip" aria-label="Drag to reorder">&#8942;&#8942;</span><img src="${esc(it.url)}" alt="" draggable="false"><span class="rt">${esc(it.caption || "No caption")}</span></div>`).join("");
+    $("roMsg").textContent = ""; $("ro").showModal();
+  }
+  (function(){
+    const L = $("roList"); let dr = null;
+    L.addEventListener("pointerdown", e => { const g = e.target.closest(".grip"); if (!g) return; dr = g.closest(".ro"); dr.classList.add("drag"); L.setPointerCapture(e.pointerId); e.preventDefault(); });
+    L.addEventListener("pointermove", e => {
+      if (!dr) return;
+      for (const r of [...L.children]){ if (r === dr) continue; const b = r.getBoundingClientRect();
+        if (e.clientY > b.top && e.clientY < b.bottom){ if (e.clientY < b.top + b.height / 2) r.before(dr); else r.after(dr); break; } }
+      const lr = L.getBoundingClientRect();
+      if (e.clientY < lr.top + 28) L.scrollTop -= 12; else if (e.clientY > lr.bottom - 28) L.scrollTop += 12;
+    });
+    const stop = () => { if (dr){ dr.classList.remove("drag"); dr = null; } };
+    L.addEventListener("pointerup", stop); L.addEventListener("pointercancel", stop);
+  })();
+  $("roForm").onsubmit = async e => {
+    e.preventDefault(); $("roGo").disabled = true; $("roMsg").textContent = "Saving…";
+    try {
+      const b = db.batch();
+      [...$("roList").children].forEach((r, k) => b.update(db.collection("album").doc(r.dataset.id), {order: k}));
+      await b.commit(); $("ro").close(); await loadItems(); drawTabs(); render(); toast("Order saved ✓");
+    } catch(err){ $("roMsg").textContent = "Could not save: " + err.message; }
+    $("roGo").disabled = false;
+  };
+
+  /* ---- private / friends-only albums ---- */
+  let friends = [];
+  const pvNote = t => { $("pvMsg").textContent = t; };
+  function drawFriends(){
+    $("pvFriends").hidden = !(me && (me.privacy === "friends"));
+    $("pvList").innerHTML = friends.length ? friends.map(f => `<div class="fr"><span>@${esc(f.handle || "user")}</span><button type="button" data-id="${esc(f.id)}" aria-label="Remove">Remove</button></div>`).join("") : `<p class="note">No friends added yet.</p>`;
+  }
+  async function loadFriends(){
+    try { friends = (await db.collection("users").doc(me.uid).collection("friends").get()).docs.map(d => ({id:d.id, ...d.data()})); } catch(e){ friends = []; }
+    drawFriends();
+  }
+  async function openPrivacy(){
+    if (!me) return;
+    pvNote(""); document.querySelectorAll('input[name="pvm"]').forEach(r => r.checked = r.value === (me.privacy || "public"));
+    drawFriends(); $("pv").showModal(); loadFriends();
+  }
+  document.querySelectorAll('input[name="pvm"]').forEach(r => r.onchange = async () => {
+    if (!r.checked || !me) return;
+    try {
+      await db.collection("users").doc(me.uid).update({privacy: r.value}); me.privacy = r.value;
+      if (view && view.uid === me.uid) view.privacy = r.value;
+      pvNote(r.value === "public" ? "Your album is public." : r.value === "friends" ? "Friends only. Add usernames below." : "Only you can see your album.");
+      drawFriends();
+    } catch(e){ pvNote(e.code === "permission-denied" ? "Not allowed yet. Publish the new Firestore rules first." : e.message); }
+  });
+  $("pvForm").onsubmit = e => { e.preventDefault(); $("pvAdd").click(); };
+  $("pvAdd").onclick = async () => {
+    const h = $("pvName").value.trim().replace(/^@/, "").toLowerCase(); if (!h || !me) return;
+    if (h === (me.handleLower || me.handle.toLowerCase())){ pvNote("That's you."); return; }
+    try {
+      const hs = await db.collection("handles").doc(h).get();
+      if (!hs.exists){ pvNote(`No account named ${h}.`); return; }
+      const uid = hs.data().uid, ud = await db.collection("users").doc(uid).get();
+      await db.collection("users").doc(me.uid).collection("friends").doc(uid).set({handle: ud.exists ? ud.data().handle : h, date: Date.now()});
+      $("pvName").value = ""; pvNote(`Added @${h}.`); await loadFriends();
+    } catch(e){ pvNote(e.code === "permission-denied" ? "Not allowed yet. Publish the new Firestore rules first." : e.message); }
+  };
+  $("pvList").onclick = async e => {
+    const b = e.target.closest("button"); if (!b) return;
+    try { await db.collection("users").doc(me.uid).collection("friends").doc(b.dataset.id).delete(); await loadFriends(); } catch(err){ pvNote(err.message); }
+  };
+
+  /* ---- pull down to refresh ---- */
+  async function refresh(){
+    if (!navigator.onLine){ toast("You're offline. Showing saved photos."); return; }
+    try { if (!view) await route(); else { await loadItems(); drawTabs(); await render(); } toast("Up to date ✓"); }
+    catch(e){ toast("Couldn't refresh."); }
+  }
+  (function(){
+    const ind = $("ptr"); let y0 = null, x0 = 0, pull = 0, busy = false;
+    const idle = () => { ind.classList.remove("spin"); ind.style.transition = "transform .25s, opacity .25s"; ind.style.opacity = 0; ind.style.transform = "translate(-50%,-60px)"; };
+    const ok = () => !busy && window.scrollY <= 0 && !document.querySelector("dialog[open]") && $("lb").hidden;
+    addEventListener("touchstart", e => { if (e.touches.length !== 1 || !ok()){ y0 = null; return; } y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; pull = 0; ind.style.transition = "none"; }, {passive:true});
+    addEventListener("touchmove", e => {
+      if (y0 === null) return;
+      const dy = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0);
+      if (dy <= 0 || dx > dy || window.scrollY > 0){ pull = 0; return; }
+      pull = Math.min(110, dy * .5); ind.style.opacity = Math.min(1, pull / 55);
+      ind.style.transform = `translate(-50%,${pull - 50}px) rotate(${pull * 4}deg)`;
+    }, {passive:true});
+    addEventListener("touchend", async () => {
+      if (y0 === null) return; y0 = null;
+      if (pull >= 60){ busy = true; ind.style.transition = "transform .2s"; ind.style.transform = "translate(-50%,22px)"; ind.classList.add("spin"); await refresh(); busy = false; }
+      idle(); pull = 0;
+    }, {passive:true});
+  })();
+
+  window.__waitData = true;
+  route().catch(()=>{}).finally(hideLater);
 }
 </script>
-<!-- Install app button -->
-<div class="pwa" id="pwa" hidden>
-  <button class="go" id="pwaGo" type="button" aria-label="Install Our Album as an app">
-    <img id="pwaIcon" alt="" width="30" height="30">
-    <span>Install app<small>Add Our Album to your device</small></span>
-  </button>
-  <button class="x" id="pwaX" type="button" aria-label="Hide install button">&times;</button>
-</div>
-<dialog id="pwaHelp" class="pwaSheet">
-  <h2>Install Our Album</h2>
-  <p id="pwaHelpIntro">Add it to your home screen to open it like an app.</p>
-  <ol id="pwaSteps"></ol>
-  <div class="row"><button type="button" class="btn" id="pwaOk">Got it</button></div>
-</dialog>
+
 <script>
+/* ---- loading screen ---- */
 (function(){
-  var $=function(id){return document.getElementById(id)};
-  var standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
-  var ua=navigator.userAgent, iOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-  var evt=null, KEY="albumInstallHiddenUntil";
-  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+  const sp = document.getElementById("splash"), msg = document.getElementById("splashMsg");
+  window.showSplash = t => { msg.textContent = t || "Loading…"; sp.classList.remove("off"); };
+  window.hideSplash = () => sp.classList.add("off");
+  setTimeout(window.hideSplash, 8000); /* safety: never get stuck */
+  window.addEventListener("load", () => setTimeout(() => { if (!window.__waitData) window.hideSplash(); }, 400));
+})();
 
-  /* app icon + manifest, built in the page so no extra files are needed */
-  function icon(n){
-    var c=document.createElement("canvas");c.width=c.height=n;var g=c.getContext("2d");
-    var bg=g.createLinearGradient(0,0,n,n);bg.addColorStop(0,"#ff7ad9");bg.addColorStop(.55,"#9b7bff");bg.addColorStop(1,"#5ee0ff");
-    g.fillStyle=bg;g.fillRect(0,0,n,n);
-    g.fillStyle="rgba(255,255,255,.28)";g.beginPath();g.arc(n*.3,n*.2,n*.45,0,7);g.fill();
-    g.fillStyle="#fff";var u=n/10;
-    g.beginPath();g.roundRect?g.roundRect(2*u,2.8*u,6*u,4.8*u,.8*u):g.rect(2*u,2.8*u,6*u,4.8*u);g.fill();
-    g.fillStyle="#7b4dff";g.beginPath();g.arc(5*u,5.2*u,1.45*u,0,7);g.fill();
-    g.fillStyle="#fff";g.fillRect(3.4*u,2.2*u,1.6*u,.8*u);
-    return c.toDataURL("image/png");
-  }
-  try{
-    var i192=icon(192),i512=icon(512),i180=icon(180);
-    $("pwaIcon").src=i192;
-    var base=location.origin+location.pathname.replace(/[^\/]*$/,"");
-    var man={name:"Our Album",short_name:"Album",description:"Photo and memory albums.",
-      start_url:location.origin+location.pathname,scope:base,display:"standalone",
-      background_color:"#140b3a",theme_color:"#140b3a",
-      icons:[{src:i192,sizes:"192x192",type:"image/png",purpose:"any"},{src:i512,sizes:"512x512",type:"image/png",purpose:"any"},{src:i512,sizes:"512x512",type:"image/png",purpose:"maskable"}]};
-    var l=document.createElement("link");l.rel="manifest";
-    l.href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:"application/manifest+json"}));
+/* ---- one-tap install ---- */
+(function(){
+  const btn = document.getElementById("installBtn"), toast = document.getElementById("toast");
+  let dp = null, tt;
+  const say = t => { toast.textContent = t; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 4500); };
+  const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if (standalone()) return;
+  btn.classList.add("show");
+
+  /* build the app manifest + icons on the fly so this stays a single file */
+  try {
+    const icon = n => { const c = document.createElement("canvas"); c.width = c.height = n; const x = c.getContext("2d");
+      const g = x.createLinearGradient(0, 0, n, n); g.addColorStop(0, "#ff7ad9"); g.addColorStop(.55, "#9b7bff"); g.addColorStop(1, "#5ee0ff");
+      x.fillStyle = "#0a0720"; x.fillRect(0, 0, n, n); x.fillStyle = g; x.beginPath(); x.arc(n/2, n/2, n*.34, 0, 7); x.fill();
+      x.fillStyle = "#0a0720"; x.font = "italic " + Math.round(n*.36) + "px Georgia,serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("A", n/2, n/2 + n*.02);
+      return c.toDataURL("image/png"); };
+    const url = location.origin + location.pathname;
+    const m = { name: "Our Album", short_name: "Our Album", start_url: url, scope: location.origin + location.pathname.replace(/[^\/]*$/, ""),
+      display: "standalone", background_color: "#0a0720", theme_color: "#0a0720",
+      icons: [{ src: icon(192), sizes: "192x192", type: "image/png", purpose: "any" }, { src: icon(512), sizes: "512x512", type: "image/png", purpose: "any" }] };
+    const l = document.createElement("link"); l.rel = "manifest";
+    l.href = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: "application/manifest+json" }));
     document.head.appendChild(l);
-    var a=document.createElement("link");a.rel="apple-touch-icon";a.href=i180;document.head.appendChild(a);
-  }catch(e){}
+    const t = document.createElement("meta"); t.name = "theme-color"; t.content = "#0a0720"; document.head.appendChild(t);
+  } catch (e) {}
 
-  var bar=$("pwa");
-  function hiddenByUser(){var t=+store(KEY);return t&&Date.now()<t}
-  function show(){if(!standalone&&!hiddenByUser())bar.hidden=false}
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); dp = e; });
+  window.addEventListener("appinstalled", () => { dp = null; btn.classList.remove("show"); window.hideSplash(); say("Our Album is installed ✓"); });
 
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();evt=e;show()});
-  window.addEventListener("appinstalled",function(){bar.hidden=true;evt=null});
-
-  function steps(list,intro){
-    $("pwaHelpIntro").textContent=intro;
-    $("pwaSteps").innerHTML=list.map(function(t){return"<li><span>"+t+"</span></li>"}).join("");
-    $("pwaHelp").showModal();
-  }
-  var shareIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
-
-  $("pwaGo").onclick=function(){
-    if(evt){
-      evt.prompt();
-      evt.userChoice.then(function(r){if(r.outcome==="accepted")bar.hidden=true;evt=null});
-    }else if(iOS){
-      steps(["Tap the Share button "+shareIcon+" in Safari\u2019s toolbar.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. Our Album now opens like an app."],"Safari installs apps from the Share menu.");
-    }else{
-      steps(["Open your browser\u2019s menu (\u22EE or \u2630).","Choose <b>Install app</b> or <b>Add to Home screen</b>.","Confirm, and Our Album will open like an app."],"This browser doesn\u2019t offer a one-tap install, but you can still add it.");
+  btn.onclick = async () => {
+    if (dp) {
+      const p = dp; dp = null;
+      showSplash("Installing Our Album…");
+      try { await p.prompt(); const r = await p.userChoice;
+        if (r.outcome === "accepted") { setTimeout(() => { hideSplash(); btn.classList.remove("show"); say("Our Album is installed ✓"); }, 1800); }
+        else { hideSplash(); dp = p; }
+      } catch (e) { hideSplash(); }
+    } else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+      say("On iPhone/iPad: tap Share, then Add to Home Screen.");
+    } else {
+      say("Install isn't available in this browser yet. Try Chrome or Edge.");
     }
   };
-  $("pwaOk").onclick=function(){$("pwaHelp").close()};
-  $("pwaHelp").addEventListener("click",function(e){if(e.target===this)this.close()});
-  $("pwaX").onclick=function(){bar.hidden=true;store(KEY,String(Date.now()+7*864e5))};
+})();
+</script>
 
-  /* iOS never fires beforeinstallprompt; other browsers that don't either still get the button */
-  if(!standalone){
-    if(iOS)show();
-    else setTimeout(function(){if(!evt)show()},2500);
+<script>
+/* ---- toast, share, download ---- */
+(function(){
+  const el = document.getElementById("toast"); let t;
+  window.toast = msg => { el.textContent = msg; el.classList.add("on"); clearTimeout(t); t = setTimeout(() => el.classList.remove("on"), 3500); };
+  const name = it => "our-album-" + (it.id || Date.now()) + ".jpg";
+  const blobOf = async it => (await fetch(it.url)).blob();
+  window.downloadPhoto = async it => {
+    try { const b = await blobOf(it), u = URL.createObjectURL(b), a = document.createElement("a");
+      a.href = u; a.download = name(it); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast("Saved to your downloads"); }
+    catch(e){ toast("Couldn't download this photo."); }
+  };
+  window.sharePhoto = async it => {
+    try { const b = await blobOf(it), f = new File([b], name(it), {type: b.type || "image/jpeg"});
+      if (navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:"Our Album", text: it.caption || ""}); return; }
+      if (navigator.share){ await navigator.share({title:"Our Album", text: it.caption || "", url: location.href}); return; }
+      await navigator.clipboard.writeText(location.href); toast("Link copied");
+    } catch(e){ if (!e || e.name !== "AbortError") toast("Couldn't share this photo."); }
+  };
+})();
+
+/* ---- full-screen viewer: swipe, pinch to zoom, double-tap ---- */
+(function(){
+  const $ = id => document.getElementById(id), lb = $("lb"), im = $("lbImg"), box = $("lbBox"), cnt = $("lbCount"), cap = $("lbCap");
+  let items = [], i = 0, onIdx = null, s = 1, tx = 0, ty = 0, lastTap = 0, pinch = null, pan = null, swipe = null, histPushed = false;
+  const ptrs = new Map();
+  const apply = anim => { im.style.transition = anim ? "transform .25s ease" : "none"; im.style.transform = `translate(${tx}px,${ty}px) scale(${s})`; };
+  const clamp = () => {
+    if (s <= 1){ tx = ty = 0; return; }
+    const mx = Math.max(0, (im.clientWidth * s - box.clientWidth) / 2), my = Math.max(0, (im.clientHeight * s - box.clientHeight) / 2);
+    tx = Math.min(mx, Math.max(-mx, tx)); ty = Math.min(my, Math.max(-my, ty));
+  };
+  function show(k, dir){
+    i = (k + items.length) % items.length; const it = items[i];
+    im.src = it.url; cap.textContent = it.caption || ""; cnt.textContent = `${i + 1} / ${items.length}`;
+    s = 1; tx = ty = 0; apply(false);
+    if (dir) im.animate([{opacity:0, transform:`translateX(${dir * 40}px)`}, {opacity:1, transform:"none"}], {duration:220, easing:"ease-out"});
+    lb.querySelectorAll(".lbn").forEach(b => b.hidden = items.length < 2);
+    if (onIdx) onIdx(i);
   }
+  window.openLb = (its, idx, cb) => {
+    items = its; onIdx = cb; lb.hidden = false; document.body.style.overflow = "hidden";
+    show(idx, 0); try { history.pushState({lb:1}, "", location.href); histPushed = true; } catch(e){}
+  };
+  function close(fromPop){
+    if (lb.hidden) return; lb.hidden = true; document.body.style.overflow = ""; ptrs.clear(); pinch = pan = swipe = null;
+    if (!fromPop && histPushed){ histPushed = false; history.back(); } else histPushed = false;
+  }
+  addEventListener("popstate", () => { histPushed = false; close(true); });
+  $("lbX").onclick = () => close(); $("lbPrev").onclick = () => show(i - 1, -1); $("lbNext").onclick = () => show(i + 1, 1);
+  $("lbShare").onclick = () => sharePhoto(items[i]); $("lbDl").onclick = () => downloadPhoto(items[i]);
+  addEventListener("keydown", e => { if (lb.hidden) return;
+    if (e.key === "Escape") close(); else if (e.key === "ArrowRight" && items.length > 1) show(i + 1, 1); else if (e.key === "ArrowLeft" && items.length > 1) show(i - 1, -1); });
+
+  box.addEventListener("pointerdown", e => {
+    box.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if (ptrs.size === 2){ const [a, b] = [...ptrs.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y) || 1, s0: s}; swipe = null; }
+    else if (ptrs.size === 1){ pan = {x:e.clientX, y:e.clientY, tx0:tx, ty0:ty}; swipe = {x:e.clientX, y:e.clientY, moved:false}; }
+  });
+  box.addEventListener("pointermove", e => {
+    const p = ptrs.get(e.pointerId); if (!p) return; p.x = e.clientX; p.y = e.clientY;
+    if (ptrs.size === 2 && pinch){
+      const [a, b] = [...ptrs.values()]; s = Math.min(5, Math.max(1, pinch.s0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d)); clamp(); apply(false);
+    } else if (ptrs.size === 1 && pan){
+      const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+      if (swipe && Math.abs(dx) + Math.abs(dy) > 8) swipe.moved = true;
+      if (s > 1){ tx = pan.tx0 + dx; ty = pan.ty0 + dy; clamp(); }
+      else if (Math.abs(dy) > Math.abs(dx)){ tx = 0; ty = Math.max(0, dy); }
+      else { tx = dx; ty = 0; }
+      apply(false);
+    }
+  });
+  function end(e){
+    if (!ptrs.delete(e.pointerId)) return;
+    if (pinch && ptrs.size < 2){
+      pinch = null; if (s < 1.05){ s = 1; tx = ty = 0; apply(true); }
+      if (ptrs.size === 1){ const [p] = [...ptrs.values()]; pan = {x:p.x, y:p.y, tx0:tx, ty0:ty}; } else pan = null;
+      swipe = null; return;
+    }
+    if (ptrs.size === 0 && swipe){
+      const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, sw = swipe; swipe = null; pan = null;
+      if (!sw.moved){
+        const now = Date.now();
+        if (now - lastTap < 320){
+          lastTap = 0;
+          if (s > 1){ s = 1; tx = ty = 0; }
+          else { const r = box.getBoundingClientRect(); s = 2.5; tx = (e.clientX - (r.left + r.width / 2)) * (1 - s); ty = (e.clientY - (r.top + r.height / 2)) * (1 - s); clamp(); }
+          apply(true);
+        } else lastTap = now;
+      } else if (s === 1){
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) && items.length > 1) show(i + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+        else if (dy > 110 && Math.abs(dy) > Math.abs(dx)) close();
+        else { tx = ty = 0; apply(true); }
+      }
+    }
+  }
+  box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
+  box.addEventListener("wheel", e => { e.preventDefault(); s = Math.min(5, Math.max(1, s * (e.deltaY < 0 ? 1.15 : 1 / 1.15))); clamp(); apply(false); }, {passive:false});
+})();
+
+/* ---- offline: service worker + status ---- */
+(function(){
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
+    navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(() => {
+      /* save this page too, so the very first offline launch works */
+      if (window.caches) caches.open("album-v1").then(c => fetch(location.href).then(r => { if (r.ok) c.put(location.origin + location.pathname, r); })).catch(() => {});
+    }).catch(() => {});
+  }
+  addEventListener("offline", () => toast("You're offline. Showing saved photos."));
+  addEventListener("online", () => toast("Back online ✓"));
 })();
 </script>
 </body>
